@@ -213,31 +213,18 @@ void doReadAnalogs()
 #ifdef PROCESS_MODBUS
 void refreshModbusRegisters()
 {
-  blconvert.val = T1_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE1] = blconvert.regsl[0];
-  modbusRegisters[HR_TEMPERATURE1 + 1] = blconvert.regsl[1];
-  blconvert.val = N1_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE2] = blconvert.regsl[0];
-  modbusRegisters[HR_TEMPERATURE2 + 1] = blconvert.regsl[1];
-  blconvert.val = N2_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE3] = blconvert.regsl[0];
-  modbusRegisters[HR_TEMPERATURE3 + 1] = blconvert.regsl[1];
-  blconvert.val = N3_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE4] = blconvert.regsl[0];
-  modbusRegisters[HR_TEMPERATURE4 + 1] = blconvert.regsl[1];
-  blconvert.val = T1_PT004.getScaledSample() * 100;
-  modbusRegisters[HR_PRESSURE1] = blconvert.regsl[0];
-  modbusRegisters[HR_PRESSURE1 + 1] = blconvert.regsl[1];
-  blconvert.val = N1_PT004.getScaledSample() * 100;
-  modbusRegisters[HR_PRESSURE2] = blconvert.regsl[0];
-  modbusRegisters[HR_PRESSURE2 + 1] = blconvert.regsl[1];
-  blconvert.val = N2_PT004.getScaledSample() * 100;
-  modbusRegisters[HR_PRESSURE3]     = blconvert.regsl[0];
-  modbusRegisters[HR_PRESSURE3 + 1] = blconvert.regsl[1];
-  blconvert.val = heartBeat;
-  modbusRegisters[HR_HEARTBEAT]     = blconvert.regsl[0];  
-  modbusRegisters[HR_HEARTBEAT + 1] = blconvert.regsl[1];
+
+  modbusRegisters[HR_TEMPERATURE1] = T1_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_TEMPERATURE2] = N1_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_TEMPERATURE3] = N2_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_TEMPERATURE4] = N3_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_PRESSURE1] = T1_PT004.getScaledSample() * 100;
+  modbusRegisters[HR_PRESSURE2] = N1_PT004.getScaledSample() * 100;
+  modbusRegisters[HR_PRESSURE3] = N2_PT004.getScaledSample() * 100;
+  modbusRegisters[HR_PRESSURE4] = N2_PT004.getScaledSample() * 100;
+  modbusRegisters[HR_HEARTBEAT] = heartBeat;
 }
+
 
 bool getModbusCoilValue(unsigned short startAddress, unsigned short bitPos)
 {
