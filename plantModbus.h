@@ -43,7 +43,7 @@
 #define VALVE2_CLOSE		VALVE2_OPEN 	+ 1  
 #define VALVE3_OPEN			VALVE2_CLOSE 	+ 1  
 #define VALVE3_CLOSE		VALVE3_OPEN     + 1
-#define VALVE4_OPEN			VALVE2_CLOSE 	+ 1  
+#define VALVE4_OPEN			VALVE3_CLOSE 	+ 1  
 #define VALVE4_CLOSE		VALVE4_OPEN     + 1 
 
 

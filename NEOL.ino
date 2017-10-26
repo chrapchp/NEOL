@@ -29,7 +29,13 @@
 
 
 // comment out to not include terminal processing
-#define PROCESS_TERMINAL
+//#define PROCESS_TERMINAL
+//#define TRACE_1WIRE
+//#define TRACE_ANALOGS
+//#define TRACE_DISCRETES
+//#define TRACE_MODBUS
+
+
 // comment out to disable modbus
 #define PROCESS_MODBUS
 // refresh intervals
@@ -65,10 +71,14 @@ DA_AnalogInput N1_PT004 = DA_AnalogInput(A2, 0.0, 5.); // min max
 DA_AnalogInput N2_PT004 = DA_AnalogInput(A6, 0.0, 5.); // min max
 DA_AnalogInput N3_PT004 = DA_AnalogInput(A7, 0.0, 5.); // min max
 
+#ifdef PROCESS_TERMINAL
+DA_DiscreteOutput LED = DA_DiscreteOutput( 13, HIGH);  // for debugging
+#endif
+
 
 // HEARTBEAT
 
-unsigned int heartBeat = 0;
+unsigned long heartBeat = 0;
 
 struct _AlarmEntry
 {
@@ -80,7 +90,11 @@ struct _AlarmEntry
 typedef _AlarmEntry AlarmEntry;
 AlarmEntry onRefreshAnalogs; // sonar and 1-wire read refresh
 AlarmEntry onFlowCalc; // flow calculations
+#ifdef PROCESS_TERMINAL
 HardwareSerial *tracePort = & Serial2;
+#endif
+
+
 void onEdgeDetect(bool state, int pin)
 {
   #ifdef PROCESS_TERMINAL
@@ -108,7 +122,7 @@ void init1WireTemperatureSensor(DallasTemperature * sensor, int idx)
   if (sensor -> getAddress(address, 0))
   {
 
-#ifdef PROCESS_TERMINAL
+#ifdef TRACE_1WIRE
     *tracePort << "Channel " << idx << " 1Wire Temperature initialized. Address =  ";
     printOneWireAddress(tracePort, address, true);
 #endif
@@ -118,7 +132,7 @@ void init1WireTemperatureSensor(DallasTemperature * sensor, int idx)
   else
   {
 
-#ifdef PROCESS_TERMINAL
+#ifdef TRACE_1WIRE
     *tracePort << "Unable to find address for 1Wire Temperature Device @ " << idx << endl;
 #endif
 
@@ -156,9 +170,9 @@ void loop()
 {
 
 #ifdef PROCESS_MODBUS
- // refreshModbusRegisters();
- // slave.poll(modbusRegisters, MODBUS_REG_COUNT);
- // processModbusCommands();
+  refreshModbusRegisters();
+  slave.poll(modbusRegisters, MODBUS_REG_COUNT);
+  processModbusCommands();
 #endif
 
   Alarm.delay(ALARM_REFRESH_INTERVAL);
@@ -171,9 +185,7 @@ void doOnPoll()
   doProcess1WireTemperatures();
   heartBeat++;
 
-    refreshModbusRegisters();
-  slave.poll(modbusRegisters, MODBUS_REG_COUNT);
-  processModbusCommands();
+
 }
 
 
@@ -181,7 +193,7 @@ void doOnPoll()
 void doPoll1WireTemperature( DallasTemperature *sensor, int idx ) 
 {
   sensor->requestTemperatures();
-  #ifdef PROCESS_TERMINAL
+  #ifdef TRACE_1WIRE
     *tracePort << "Temperature " << idx << " = " << sensor->getTempCByIndex(0) << " C" << endl;
   #endif
 }
@@ -202,7 +214,8 @@ void doReadAnalogs()
   N1_PT004.refresh();
   N2_PT004.refresh();
 
-  #ifdef PROCESS_TERMINAL
+
+  #ifdef TRACE_ANALOGS
       T1_PT004.serialize( tracePort, true);
       N1_PT004.serialize( tracePort, true);
       N2_PT004.serialize( tracePort, true);
@@ -292,22 +305,48 @@ void refreshModbusRegisters()
 bool getModbusCoilValue( unsigned short startAddress, unsigned short bitPos)
 {
 
-  *tracePort << "reading at " << startAddress << " bit offset " << bitPos << "value=" << bitRead(modbusRegisters[startAddress + (int)(bitPos / 16)], bitPos % 16 ) << endl;
+  //*tracePort << "reading at " << startAddress << " bit offset " << bitPos << "value=" << bitRead(modbusRegisters[startAddress + (int)(bitPos / 16)], bitPos % 16 ) << endl;
 
   return ( bitRead(modbusRegisters[startAddress + (int)(bitPos / 16)], bitPos % 16 ) );
 }
 
+void writeModbusCoil( unsigned short startAddress, unsigned short bitPos, bool value )
+{
+  bitWrite(modbusRegisters[startAddress + (int)(bitPos / 16)], bitPos % 16 , value) ;
+}
 
 void checkAndActivateDO( unsigned int bitOffset, DA_DiscreteOutput *aDO )
 {
+  // look for a change from 0 to 1
    if(  getModbusCoilValue( COIL_STATUS_READ_WRITE_OFFSET, bitOffset )  )
-      aDO->activate();
+   {
+          aDO->activate();
+    #ifdef TRACE_MODBUS
+      *tracePort << "Activate DO:" ;
+       aDO->serialize( tracePort, true);
+            LED.activate();
+    #endif
+
+ 
+      writeModbusCoil( COIL_STATUS_READ_WRITE_OFFSET, bitOffset, false); // clear the bit
+   }
 }
 
 void checkAndResetDO( unsigned int bitOffset, DA_DiscreteOutput *aDO )
-{
+{ 
+    // look for a change from 0 to 1
    if(  getModbusCoilValue( COIL_STATUS_READ_WRITE_OFFSET, bitOffset )  )
-      aDO->reset();
+   {
+          aDO->reset();
+        #ifdef TRACE_MODBUS
+      *tracePort << "Reset DO:" ;
+      aDO->serialize( tracePort, true);
+      LED.reset();
+    #endif
+
+ 
+      writeModbusCoil( COIL_STATUS_READ_WRITE_OFFSET, bitOffset, false); // clear the bit
+   }
 }
 
 
@@ -316,16 +355,16 @@ void checkAndResetDO( unsigned int bitOffset, DA_DiscreteOutput *aDO )
 void processValveCommands()
 {
   checkAndActivateDO( VALVE1_OPEN, &T1_XY004 );
-  checkAndActivateDO( VALVE1_CLOSE, &T1_XY004 );  
+  checkAndResetDO( VALVE1_CLOSE, &T1_XY004 );  
 
   checkAndActivateDO( VALVE2_OPEN, &N1_XY004 );
-  checkAndActivateDO( VALVE2_CLOSE, &N1_XY004 ); 
+  checkAndResetDO( VALVE2_CLOSE, &N1_XY004 ); 
 
   checkAndActivateDO( VALVE3_OPEN, &N2_XY004 );
-  checkAndActivateDO( VALVE3_CLOSE, &N2_XY004 ); 
+  checkAndResetDO( VALVE3_CLOSE, &N2_XY004 ); 
   
   checkAndActivateDO( VALVE4_OPEN, &N3_XY004 );
-  checkAndActivateDO( VALVE4_CLOSE, &N3_XY004 ); 
+  checkAndResetDO( VALVE4_CLOSE, &N3_XY004 ); 
  
 }
 
