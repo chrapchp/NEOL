@@ -57,6 +57,8 @@ DA_AnalogInput N1_PT004 = DA_AnalogInput(A2, 0.0, 5.); // min max
 DA_AnalogInput N2_PT004 = DA_AnalogInput(A6, 0.0, 5.); // min max
 DA_AnalogInput N3_PT004 = DA_AnalogInput(A7, 0.0, 5.); // min max
 
+DA_DiscreteOutput MAX285TX_ENABLE = DA_DiscreteOutput( 6, HIGH );  // 1 is enable, 0 rx enabled
+
 #ifdef PROCESS_TERMINAL
 DA_DiscreteOutput LED = DA_DiscreteOutput(13, HIGH); // for debugging
 #endif
