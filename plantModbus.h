@@ -84,6 +84,7 @@
 */
 #define MB_SLAVE_ID				1
 #define MB_SERIAL_PORT			0
+#define MB_MAX485_PIN			6
 
 
 
@@ -104,6 +105,6 @@ blconvert;
 
 uint16_t modbusRegisters[MODBUS_REG_COUNT];
 
-Modbus slave(MB_SLAVE_ID, MB_SERIAL_PORT); 
+Modbus slave(MB_SLAVE_ID, MB_SERIAL_PORT,MB_MAX485_PIN); 
 
 
