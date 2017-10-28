@@ -21,7 +21,7 @@
 #include <DA_DiscreteOutput.h>
 #include <DA_DiscreteOutputTmr.h>
 #include <DA_HOASwitch.h>
-#include "PlantModbus.h"
+#include "unitModbus.h"
 // comment out to  include terminal processing for debugging
 // #define PROCESS_TERMINAL
 // #define TRACE_1WIRE
@@ -64,7 +64,7 @@ DA_DiscreteOutput LED = DA_DiscreteOutput(13, HIGH); // for debugging
 #endif
 
 // HEARTBEAT
-unsigned long heartBeat = 0;
+unsigned int heartBeat = 0;
 struct _AlarmEntry
 {
   time_t epoch;
