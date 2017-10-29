@@ -52,10 +52,10 @@ DA_DiscreteOutput B1N1_T1_XY004 = DA_DiscreteOutput(3, LOW); // V1
 DA_DiscreteOutput B1N1_N1_XY004 = DA_DiscreteOutput(11, LOW); // V2
 DA_DiscreteOutput B1N1_N2_XY004 = DA_DiscreteOutput(10, LOW); // V3
 DA_DiscreteOutput B1N1_N3_XY004 = DA_DiscreteOutput(9, LOW); // V4
-DA_AnalogInput B1N1_T1_PT004 = DA_AnalogInput(A1, 0.0, 5.); // min max
-DA_AnalogInput B1N1_N1_PT004 = DA_AnalogInput(A2, 0.0, 5.); // min max
-DA_AnalogInput B1N1_N2_PT004 = DA_AnalogInput(A6, 0.0, 5.); // min max
-DA_AnalogInput B1N1_N3_PT004 = DA_AnalogInput(A7, 0.0, 5.); // min max
+DA_AnalogInput B1N1_T1_PT004 = DA_AnalogInput(A1, 0.0, 1023.); // min max
+DA_AnalogInput B1N1_N1_PT004 = DA_AnalogInput(A2, 0.0, 1023.); // min max
+DA_AnalogInput B1N1_N2_PT004 = DA_AnalogInput(A6, 0.0, 1023.); // min max
+DA_AnalogInput B1N1_N3_PT004 = DA_AnalogInput(A7, 0.0, 1023.); // min max
 
 //DA_DiscreteOutput MAX285TX_ENABLE = DA_DiscreteOutput( 6, HIGH );  // 1 is enable, 0 rx enabled
 
