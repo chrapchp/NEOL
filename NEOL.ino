@@ -11,7 +11,6 @@
 ** 2017Oct25 - created
 */
 #include <HardwareSerial.h>
-#include <TimeAlarms.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Wire.h> // for RTC
@@ -21,6 +20,9 @@
 #include <DA_DiscreteOutput.h>
 #include <DA_DiscreteOutputTmr.h>
 #include <DA_HOASwitch.h>
+#include <DA_NonBlockingDelay.h>
+
+
 #include "unitModbus.h"
 // comment out to  include terminal processing for debugging
 // #define PROCESS_TERMINAL
@@ -32,7 +34,7 @@
 #define PROCESS_MODBUS
 // refresh intervals
 #define POLL_CYCLE_SECONDS 2 // sonar and 1-wire refresh rate
-#define ALARM_REFRESH_INTERVAL 100 // ms
+#define ALARM_REFRESH_INTERVAL 10 // ms
 // One Wire - Hydroponic temperatures
 // 
 #define TEMPERATURE1 8 // pin
@@ -57,39 +59,22 @@ DA_AnalogInput B1N1_N1_PT004 = DA_AnalogInput(A2, 0.0, 1023.); // min max
 DA_AnalogInput B1N1_N2_PT004 = DA_AnalogInput(A6, 0.0, 1023.); // min max
 DA_AnalogInput B1N1_N3_PT004 = DA_AnalogInput(A7, 0.0, 1023.); // min max
 
-//DA_DiscreteOutput MAX285TX_ENABLE = DA_DiscreteOutput( 6, HIGH );  // 1 is enable, 0 rx enabled
 
-#ifdef PROCESS_TERMINAL
-DA_DiscreteOutput LED = DA_DiscreteOutput(13, HIGH); // for debugging
-#endif
+
+// poll I/O every 2 seconds
+DA_NonBlockingDelay pollTimer = DA_NonBlockingDelay( 2000, &doOnPoll);
+
 
 // HEARTBEAT
 unsigned int heartBeat = 0;
 
 
-struct _AlarmEntry
-{
-  time_t epoch;
-  AlarmId id = dtINVALID_ALARM_ID;
-  bool firstTime = true;
-};
-
-typedef _AlarmEntry AlarmEntry;
-AlarmEntry onRefreshAnalogs; // sonar and 1-wire read refresh
-AlarmEntry onFlowCalc; // flow calculations
 
 #ifdef PROCESS_TERMINAL
 HardwareSerial *tracePort = & Serial2;
 #endif
 
-void onEdgeDetect(bool state, int pin)
-{
 
-#ifdef PROCESS_TERMINAL
-  *tracePort << "Edge Detection:" << state << " on pin " << pin << endl;
-#endif
-
-}
 
 void printOneWireAddress(HardwareSerial *tracePort, DeviceAddress aDeviceAddress, bool aCR)
 {
@@ -150,7 +135,7 @@ void setup()
 #endif
 
   randomSeed(analogRead(3));
-  onRefreshAnalogs.id = Alarm.timerRepeat(POLL_CYCLE_SECONDS, doOnPoll);
+
   initHydroponicOneWireTemps();
 }
 
@@ -162,8 +147,8 @@ void loop()
   slave.poll(modbusRegisters, MODBUS_REG_COUNT);
   processModbusCommands();
 #endif
+pollTimer.refresh();
 
-  Alarm.delay(ALARM_REFRESH_INTERVAL);
 }
 
 // update sonar and 1-wire DHT-22 readings
