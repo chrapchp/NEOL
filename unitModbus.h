@@ -22,7 +22,7 @@
 // specific write holding registers to unit
 #define FUTURES CUSTOM_HR_START_WRITE
 
-
+#define HEART_BEAT 18
 // 
 // write analogs/sp specific to units
 //  HOLDING_REGISTER_WRITE_OFFSET + LAST #DEFINE IN THE LIST ON TOP.

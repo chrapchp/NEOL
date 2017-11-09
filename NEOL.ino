@@ -212,7 +212,7 @@ void refreshModbusRegisters()
   modbusRegisters[HR_PRESSURE2] = B1N1_N3_PT004.getRawSample();
   modbusRegisters[HR_PRESSURE3] = B1N1_N2_PT004.getRawSample();
   modbusRegisters[HR_PRESSURE4] = B1N1_N1_PT004.getRawSample();
-  modbusRegisters[HR_HEARTBEAT] = heartBeat;
+  modbusRegisters[HEART_BEAT] = heartBeat;
 }
 
 
