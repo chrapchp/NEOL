@@ -205,9 +205,9 @@ void refreshModbusRegisters()
 {
 
   modbusRegisters[HR_TEMPERATURE1] = B1N1_T1_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE2] = B1N1_N1_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_TEMPERATURE2] = B1N1_N3_TT004.getTempCByIndex(0) * 100;
   modbusRegisters[HR_TEMPERATURE3] = B1N1_N2_TT004.getTempCByIndex(0) * 100;
-  modbusRegisters[HR_TEMPERATURE4] = B1N1_N3_TT004.getTempCByIndex(0) * 100;
+  modbusRegisters[HR_TEMPERATURE4] = B1N1_N1_TT004.getTempCByIndex(0) * 100;
   modbusRegisters[HR_PRESSURE1] = B1N1_T1_PT004.getRawSample();
   modbusRegisters[HR_PRESSURE2] = B1N1_N1_PT004.getRawSample();
   modbusRegisters[HR_PRESSURE3] = B1N1_N2_PT004.getRawSample();
@@ -266,14 +266,14 @@ void processValveCommands()
   checkAndActivateDO(VALVE1_OPEN_CLOSE, & B1N1_T1_XY004);
   checkAndResetDO(VALVE1_OPEN_CLOSE, & B1N1_T1_XY004);
 
-  checkAndActivateDO(VALVE2_OPEN_CLOSE, & B1N1_N3_XY004);
-  checkAndResetDO(VALVE2_OPEN_CLOSE, & B1N1_N1_XY004);
+  checkAndActivateDO(VALVE4_OPEN_CLOSE, & B1N1_N3_XY004);
+  checkAndResetDO(VALVE4_OPEN_CLOSE, & B1N1_N3_XY004);
 
   checkAndActivateDO(VALVE3_OPEN_CLOSE, & B1N1_N2_XY004);
   checkAndResetDO(VALVE3_OPEN_CLOSE, & B1N1_N2_XY004);
 
-  checkAndActivateDO(VALVE4_OPEN_CLOSE, & B1N1_N1_XY004);
-  checkAndResetDO(VALVE4_OPEN_CLOSE, & B1N1_N3_XY004);
+  checkAndActivateDO(VALVE2_OPEN_CLOSE, & B1N1_N1_XY004);
+  checkAndResetDO(VALVE2_OPEN_CLOSE, & B1N1_N1_XY004);
 }
 
 void processModbusCommands()
