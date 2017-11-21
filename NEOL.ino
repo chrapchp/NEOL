@@ -18,8 +18,7 @@
 #include <DA_Analoginput.h>
 #include <DA_Discreteinput.h>
 #include <DA_DiscreteOutput.h>
-#include <DA_DiscreteOutputTmr.h>
-#include <DA_HOASwitch.h>
+
 #include <DA_NonBlockingDelay.h>
 
 
